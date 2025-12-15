@@ -52,10 +52,11 @@ Sindi also includes a **Witness Generator**. If a predicate is weakened (e.g., a
 
 ```bash
 pip install Sindi
-
 ```
 
-###From source (this repo)```bash
+### From source (this repo)
+
+```bash
 # Clone, then in repo root:
 python -m pip install -r requirements.txt
 # Optional: editable install
@@ -68,25 +69,27 @@ The comparator uses `z3-solver` (already listed in requirements).
 
 ---
 
-##Quick start (CLI)The CLI is exposed via `main.py` (or `sindi` if installed):
+## Quick start (CLI)The CLI is exposed via `main.py` (or `sindi` if installed):
 
-```
+```bash
 Sindi rewrite   <predicate> [--from-file]
 Sindi tokenize  <predicate> [--json]
 Sindi parse     <predicate> [--tree|--json]
 Sindi simplify  <predicate> [--show-sympy]
 Sindi compare   <p1> <p2> [--light] [--verbose|--json]
 Sindi witness   <new_pred> <old_pred> [--domains "var:type"] [--json]
-
 ```
 
-###1. Comparison```bash
+### 1. Comparison
+
+```bash
 python main.py compare "msg.sender == msg.origin && a >= b" "msg.sender == msg.origin"
 # -> The first predicate is stronger.
-
 ```
 
-###2. Witness Generation (Find Security Regression)If you suspect a constraint was weakened, ask for a witness:
+### 2. Witness Generation (Find Security Regression)
+
+If you suspect a constraint was weakened, ask for a witness:
 
 ```bash
 # Example: Boundary weakening
@@ -95,7 +98,6 @@ python main.py witness "x <= 100" "x < 100"
 # Status: SAT (Weakening Found)
 # Witness Model:
 #   x = 100
-
 ```
 
 **With specific domains:**
@@ -105,7 +107,6 @@ Sometimes `x != 0` and `x > 0` look different unless you know `x` is a `uint`.
 python main.py witness "val != 0" "val > 0" --domains "val:uint"
 # Output:
 # Status: UNSAT (No weakening found / Equivalent)
-
 ```
 
 **Complex Boolean Logic:**
@@ -157,12 +158,13 @@ from src.sindi.parser import Parser
 rw, tk = Rewriter(), Tokenizer()
 s = rw.apply("SafeMath.add(a,b) > c")
 ast = Parser(tk.tokenize(s)).parse()
-
 ```
 
 ---
 
-##The pipeline (architecture at a glance)1. **Rewriting / Normalization** (string → string)
+## The pipeline (architecture at a glance)
+
+1. **Rewriting / Normalization** (string → string)
 Fixes cross-version and library-specific surface differences.
 2. **Tokenization & Parsing** (string → tokens → AST)
 Produces a structured AST (`ASTNode`).
@@ -175,20 +177,24 @@ Infers types (`Bool` vs `Real`), applies domain constraints (`uint256`), and sol
 
 ---
 
-##Notes & limitations* **Numerics / domains:** For comparison, variables are assumed non-negative by default (Solidity-like). Witness generation allows strict `uint`/`int` bit-width constraints.
+## Notes & limitations
+
+* **Numerics / domains:** For comparison, variables are assumed non-negative by default (Solidity-like). Witness generation allows strict `uint`/`int` bit-width constraints.
 * **Division:** We model `a / b` as `a * (b ** -1)` in symbolic form.
 * **Functions & arrays:** Uninterpreted unless specialized; treated as symbols (e.g., `balanceOf(user)` is a symbol `balanceOf_user`).
 * **Scope:** Focused on boolean predicates used in `require`/`assert`—not full contract semantics.
 
 ---
 
-##ContributingIssues and PRs are welcome. If you add rewrite rules or parser coverage, please include targeted tests.
+## Contributing
+
+Issues and PRs are welcome. If you add rewrite rules or parser coverage, please include targeted tests.
 
 ---
 
-##Citation (paper & code)If you use Sindi in academic work, please cite the **Sindi** paper (upcoming) and this repository.
+## Citation (paper & code)
 
-* Cite our preprint report:
+If you use Sindi in academic work, please cite the **Sindi** paper (upcoming) and this repository.
 
 ```bibtex
 @techreport{SInDi,
