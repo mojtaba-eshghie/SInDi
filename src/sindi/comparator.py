@@ -7,6 +7,7 @@ from .simplifier import Simplifier
 from .rewriter import Rewriter
 from .utils import printer
 from .ast_rewriter import ASTRewriter
+from .witness import WitnessSolver
 import z3
 import re
 
@@ -596,3 +597,19 @@ class Comparator:
                         printer(f"Error (satisfiability error): {e}", level)
                         return False
         return False
+
+    def witness_solve(
+        self, 
+        new_pred: str, 
+        old_pred: str, 
+        *, 
+        domains: dict | None = None, 
+        simplify: bool = True
+    ):
+        """
+        Attempts to find a witness (input assignment) where new_pred is True
+        and old_pred is False.
+        Returns a WitnessResult object.
+        """
+        solver = WitnessSolver(self)
+        return solver.solve(new_pred, old_pred, domains=domains, simplify=simplify)
